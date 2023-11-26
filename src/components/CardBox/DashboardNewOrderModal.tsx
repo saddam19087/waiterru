@@ -17,7 +17,7 @@ type Props = {
   onCancel?: () => void
 }
 
-const CardBoxModal = ({
+const DashboardNewOrderModal = ({
   title,
   buttonColor,
   buttonLabel,
@@ -40,7 +40,7 @@ const CardBoxModal = ({
   return (
     <OverlayLayer onClick={onCancel} className={onCancel ? 'cursor-pointer' : ''}>
       <CardBox
-        className={`transition-transform overflow-y-auto shadow-lg  w-11/12 md:w-8/12 lg:w-8/12 xl:w-8/12 z-50`}
+        className={`transition-transform overflow-y-auto shadow-lg max-h-modal w-11/12 md:w-4/5 lg:w-4/5 xl:w-4/12 z-50`}
         isModal
        
       >
@@ -56,4 +56,4 @@ const CardBoxModal = ({
   )
 }
 
-export default CardBoxModal
+export default DashboardNewOrderModal

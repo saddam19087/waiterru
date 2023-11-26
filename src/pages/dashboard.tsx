@@ -5,6 +5,7 @@ import {
   mdiChartTimelineVariant,
   mdiGithub,
   mdiMonitorCellphone,
+  mdiPlus,
   mdiReload,
 } from '@mdi/js'
 import Head from 'next/head'
@@ -26,6 +27,9 @@ import ChartLineSample from '../components/ChartLineSample'
 import NotificationBar from '../components/NotificationBar'
 import TableSampleClients from '../components/Table/SampleClients'
 import { getPageTitle } from '../config'
+import DashboardTitle from '../components/Section/DashboardTitle'
+import DashboardNewOrderModal from '../components/CardBox/DashboardNewOrderModal'
+import { app } from '../firebase.config'
 
 const DashboardPage = () => {
   const { clients } = useSampleClients()
@@ -39,6 +43,18 @@ const DashboardPage = () => {
     e.preventDefault()
 
     setChartData(sampleChartData())
+  }
+
+
+  console.log(app);
+  
+
+  const [isModalInfoActive, setIsModalInfoActive] = useState(false)
+  const [isModalTrashActive, setIsModalTrashActive] = useState(false)
+
+  const handleModalAction = () => {
+    setIsModalInfoActive(false)
+    setIsModalTrashActive(false)
   }
 
   return (
@@ -114,13 +130,100 @@ const DashboardPage = () => {
 
         {/* <CardBox className="mb-6">{chartData && <ChartLineSample data={chartData} />}</CardBox> */}
 
-        <SectionTitleLineWithButton icon={mdiAccountMultiple} title="Clients" />
+        <DashboardTitle icon={mdiAccountMultiple} title="Orders" cliclkFun={()=>setIsModalInfoActive(true)} />
 
         {/* <NotificationBar color="info" icon={mdiMonitorCellphone}>
           <b>Responsive table.</b> Collapses on mobile
         </NotificationBar> */}
 
         <CardBox hasTable>
+          <DashboardNewOrderModal 
+           title="NEW ORDER"
+           buttonColor=""
+           buttonLabel=""
+           isActive={isModalInfoActive}
+           onConfirm={handleModalAction}
+           onCancel={handleModalAction}
+          
+          >
+      <form className="w-full ">
+      <div className="flex flex-wrap -mx-3 mb-6">
+    <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
+        NAME
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text"  />
+      {/* <p className="text-red-500 text-xs italic">Please fill out this field.</p> */}
+    </div>
+    <div className="w-full md:w-1/2 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      NUMBER
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-last-name" type="text"  />
+    </div>
+
+
+    <div className="w-full md:w-1/2 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      FROM
+      </label>
+      <select className="py-3 px-4 pr-9 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
+                 
+                  <option>Counter</option>
+                  <option>GTABLE 1</option>
+                  <option>GTABLE 2</option>
+                </select>
+     </div>
+        </div>
+        <h4>ITEM</h4>
+
+        <div className="flex flex-wrap -mx-3 mb-6">
+    <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-first-name">
+        NAME
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text"  />
+      {/* <p className="text-red-500 text-xs italic">Please fill out this field.</p> */}
+    </div>
+    <div className="w-full md:w-1/6 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      QTY
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-last-name" type="text"  />
+    </div>
+
+    <div className="w-full md:w-1/6 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      RATE
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-last-name" type="text"  />
+    </div>
+
+    <div className="w-full md:w-1/6 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      AMOUNT
+      </label>
+      <input className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-last-name" type="text"  />
+    </div>
+
+    <div className="w-full md:w-1/6 px-3">
+      <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-last-name">
+      AMOUNT
+      </label>
+      <Button
+                    color="info"
+                    icon={mdiPlus}
+                    onClick={() => setIsModalInfoActive(true)}
+                    label='ADD'
+                    small
+                    
+                  />
+      </div>
+        </div>
+
+      </form>
+
+          </DashboardNewOrderModal>
           <TableSampleClients />
         </CardBox>
       </SectionMain>

@@ -20,6 +20,11 @@
         protocol: 'https',
         hostname: 'static.justboil.me',
       },
+      {
+        protocol: 'https',
+        hostname: 't3.ftcdn.net',
+      },
+      
     ],
   },
 }

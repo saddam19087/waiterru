@@ -1,5 +1,5 @@
 import { mdiEye, mdiPrinter, mdiTrashCan } from '@mdi/js'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSampleClients } from '../../hooks/sampleData'
 import { Client } from '../../interfaces'
 import Button from '../Button'
@@ -8,9 +8,12 @@ import CardBoxModal from '../CardBox/Modal'
 import UserAvatar from '../UserAvatar'
 import FormField from '../Form/Field'
 import { Field } from 'formik'
+import { get, query, set, push, onValue, ref, getDatabase } from 'firebase/database'
+import { app } from '../../firebase.config'
 
-const TableSampleClients = () => {
+const AddTableTable = () => {
   const { clients } = useSampleClients()
+  const [data,setData] = useState();
 
   const perPage = 5
 
@@ -79,6 +82,9 @@ const TableSampleClients = () => {
       ],
     },
   ]
+
+  const HotelId = '123456789'
+
   const numPages = clients.length / perPage
 
   const pagesList = []
@@ -94,6 +100,17 @@ const TableSampleClients = () => {
     setIsModalInfoActive(false)
     setIsModalTrashActive(false)
   }
+
+  useEffect(() => {
+    const database = getDatabase(app)
+    const dataRef = ref(database, `/hotels/${HotelId}`)
+
+    const listener = onValue(dataRef, (snapshot) => {
+      const data = snapshot.val();
+      setData(data.tables);
+    })
+    return listener
+  }, [])
 
   return (
     <>
@@ -175,85 +192,27 @@ const TableSampleClients = () => {
         <thead>
           <tr>
             <th />
-            <th>Date</th>
-            <th>Order No</th>
-            <th>Table No</th>
-            <th>Order Item</th>
-            <th>QTY</th>
+            <th>#</th>
+            <th>TABLE NO</th>
 
-            <th>Order Amount</th>
-            <th>Name</th>
-            <th>Number</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>QR CODE</th>
+            <th>ACTION</th>
+
             <th />
           </tr>
         </thead>
         <tbody>
-          {clientsPaginated.map((client) => (
-            <tr key={client.order_no}>
+          {data?.map((table,index) => (
+            <tr key={table.no}>
               <td className="border-b-0 lg:w-6 before:hidden">
                 {/* <UserAvatar username={client.name} className="w-24 h-24 mx-auto lg:w-6 lg:h-6" /> */}
               </td>
-              <td data-label="Order No">{client.order_no}</td>
-              <td data-label="Table No">{client.table_no}</td>
-              <td data-label="Queue">{client.queue_no}</td>
-            
-              <td data-label="Order Item">
-              <Button
-                    color="info"
-                    icon={mdiEye}
-                    onClick={() => setIsModalInfoActive(true)}
-                    small
-                  />
-                {/* {client.order_item.map((item, index) => {
-                  return index > 0 ? (
-                    <p>
-                      {item.item_name}({item.qty}ps)....
-                    </p>
-                  ) : (
-                    ''
-                  )
-                })} */}
-              </td>
+              <td data-label="Table No">{index+1}</td>
+              <td data-label="Table No">{table.no}</td>
+              <td data-label="Table No">{table.status ? 'generated' : 'Not generated'}</td>
+              <td data-label="Table No">{table.no}</td>
 
-              <td data-label="QTY">
-                {client.order_item.reduce(
-                  (accumulator, currentValue) => accumulator + currentValue.qty,
-                  0
-                )}{' '}
-              </td>
-
-              <td data-label="Order Amount">
-                {client.order_item.reduce(
-                  (accumulator, currentValue) => accumulator + currentValue.mrp,
-                  0
-                )}
-              </td>
-              <td data-label="Name">sadam</td>
-              <td data-label="Number">6291444562</td>
-              <td data-label="Status" className="lg:w-1 whitespace-nowrap">
-                <small className="text-gray-500 dark:text-slate-400">{client.status}</small>
-              </td>
-              <td className="before:hidden  whitespace-nowrap">
-                <select className="py-3 px-4 pr-9 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
-                  <option selected>Change Status</option>
-                  <option>Cooking</option>
-                  <option>Ready</option>
-                  <option>Delivered</option>
-                </select>
-                
-              
-              </td>
-              
-              <td data-label="print">
-                <Button
-                  color="info"
-                  icon={mdiPrinter}
-                  onClick={() => setIsModalTrashActive(true)}
-                  small
-                />
-              </td>
+              {/* <td data-label="Order No">{client.order_no}</td> */}
             </tr>
           ))}
         </tbody>
@@ -262,4 +221,4 @@ const TableSampleClients = () => {
   )
 }
 
-export default TableSampleClients
+export default AddTableTable
