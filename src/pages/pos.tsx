@@ -57,6 +57,9 @@ const pos = () => {
   const [orderFrom, setOrderFrom] = useState('')
   const [orderItems, setOrders] = useState([])
   const [menus, setMenus] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
+  const [tax,setTax] = useState(0);
+  const [discount,setDiscount] = useState(0)
 
   const handleModalAction = () => {
     setIsModalInfoActive(false)
@@ -73,9 +76,85 @@ const pos = () => {
     setMenus(totalData)
   }
 
+  const getItems = () => {
+    const items = localStorage.getItem('items')
+    if (items) setSelectedItems(JSON.parse(items))
+  }
+
   useEffect(() => {
     getMenus()
   }, [])
+
+  // useEffect(()=>{
+  //   Window.
+  // },[Window])
+
+  // useEffect(() => {
+  //   console.log(selectedItems)
+
+  //   localStorage.setItem('items', JSON.stringify(selectedItems))
+  // }, [selectedItems])
+
+  // Function to check if array of objects contains a particular key-value pair
+  function containsKeyValue(arr, key, value) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i][key] === value) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const onClick = (item) => {
+    const keyToCheck = 'name'
+    const valueToCheck = item.name
+    item.quantity = 1
+    if (containsKeyValue(selectedItems, keyToCheck, valueToCheck)) {
+      incrementByName(item.name)
+      return;
+    }
+    setSelectedItems((prev) => [...prev, item])
+  }
+
+  const increment = (index, newQuantity) => {
+    setSelectedItems((prev) => {
+      return prev.map((item, i) => {
+        if (i == index) {
+          return { ...item, quantity: newQuantity }
+        } else {
+          return item
+        }
+      })
+    })
+  }
+
+  const incrementByName = (name) => {
+    setSelectedItems((prev) => {
+      return prev.map((item, i) => {
+        if (item.name == name) {
+          return { ...item, quantity: item.quantity + 1 }
+        } else {
+          console.log('else')
+          return item
+        }
+      })
+    })
+  }
+
+  const decrement = (index, newQuantity) => {
+    if (newQuantity < 1) {
+      return
+    }
+    setSelectedItems((prev) => {
+      return prev.map((item, i) => {
+        if (i == index) {
+          return { ...item, quantity: newQuantity }
+        } else {
+          return item
+        }
+      })
+    })
+  }
 
   return (
     <>
@@ -99,7 +178,7 @@ const pos = () => {
             <div className="w-full md:w-2/3 px-3 mb-6 md:mb-0">
               <div className="flex flex-wrap -mx-3 mb-6">
                 {menus.map((item) => (
-                  <OrderItemCard item={item} />
+                  <OrderItemCard item={item} onClick={onClick} />
                 ))}
               </div>
             </div>
@@ -111,54 +190,92 @@ const pos = () => {
                 </div>
 
                 <div className="w-full md:w-1/1 px-3 mb-6 p-2 md:mb-0">
-                  <div className="flex flex-wrap -mx-3 mb-1 ">
+                  {selectedItems.map((item, index) => {
+                    return (
+                      <div className="flex flex-wrap -mx-3 mb-1 items-center">
+                        <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
+                          <span>{item?.name}</span>
+                        </div>
+
+                        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+                          <div className="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
+                            <button
+                              onClick={() => decrement(index, item.quantity - 1)}
+                              data-action="decrement"
+                              className="  text-gray-600   w-20 rounded-l cursor-pointer outline-none"
+                            >
+                              <span className="m-auto text-2xl font-thin">−</span>
+                            </button>
+                            <input
+                              type="number"
+                              className="text-center w-full border-none  font-semibold text-md   md:text-basecursor-default flex items-center text-gray-700  outline-none"
+                              name="custom-input-number"
+                              value={item.quantity}
+                            ></input>
+                            <button
+                              onClick={() => increment(index, item.quantity + 1)}
+                              data-action="increment"
+                              className=" text-gray-600   w-20 rounded-r cursor-pointer"
+                            >
+                              <span className="m-auto text-2xl font-thin">+</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">${item?.mrp}</div>
+                      </div>
+                    )
+                  })}
+
+                  {/* <div className="flex flex-wrap -mx-3  mb-1">
                     <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
                       <span>Chicken Sandwich</span>
                     </div>
 
                     <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">1</div>
                     <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">$100</div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3  mb-1">
-                    <div className="w-full md:w-2/4 px-3 mb-6 md:mb-0">
-                      <span>Chicken Sandwich</span>
-                    </div>
-
-                    <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">1</div>
-                    <div className="w-full md:w-1/4 px-3 mb-6 md:mb-0">$100</div>
-                  </div>
+                  </div> */}
 
                   <div className="flex flex-wrap -mx-3 mt-4 bg-neutral-200  mb-1">
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">Items</div>
-
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">Tax</div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">Discount</div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">Sub Total</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">Items</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">QTY</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">Tax</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">Discount</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">Sub Total</div>
                   </div>
 
                   <div className="flex flex-wrap -mx-3 mt-1   mb-1">
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">2</div>
-
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">11</div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">11</div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">200</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">
+                      {
+                        selectedItems.length
+                      }
+                    </div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">
+                    {selectedItems.reduce((total, item) => total + item.quantity, 0)}
+                    </div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">11</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">11</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">
+                      
+                        {selectedItems.reduce((total, item) => total + item.quantity * item.mrp, 0)}
+                      
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap -mx-3 mt-1   mb-1">
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0"></div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0"></div>
                     <div className="w-full text-end md:w-2/4 px-3 text-sm mb-6 md:mb-0">
                       Service Charge
                     </div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">200</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">200</div>
                   </div>
 
                   <div className="flex flex-wrap -mx-3 mt-1   mb-1">
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0"></div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0"></div>
                     <div className="w-full text-end md:w-2/4 px-3 text-sm mb-6 md:mb-0">
                       Grand Total
                     </div>
-                    <div className="w-full md:w-1/4 px-3 text-sm mb-6 md:mb-0">200</div>
+                    <div className="w-full md:w-1/5 px-3 text-sm mb-6 md:mb-0">200</div>
                   </div>
                 </div>
               </div>
